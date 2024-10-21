@@ -1,0 +1,76 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #faf5ee;
+    color: #333;
+}
+
+h1 {
+    font-family: 'Georgia', serif;
+    font-size: 2.5em;
+    font-weight: bold;
+    color: #333;
+}
+
+#container {
+    display: flex;
+    gap: 20px;
+    padding: 20px;
+}
+
+#playlists {
+    flex: 1;
+    max-width: 250px;
+}
+
+#playlists h2 {
+    font-size: 1.5em;
+    margin-bottom: 10px;
+}
+
+#playlists ul {
+    list-style: none;
+    padding: 0;
+}
+
+#playlists li {
+    font-size: 1.2em;
+    padding: 5px;
+    cursor: pointer;
+}
+
+#playlists li:hover {
+    text-decoration: underline;
+}
+
+#chart {
+    flex: 3;
+}
+
+.node {
+    cursor: pointer;
+}
+
+.label {
+    font-size: 12px;
+    text-anchor: middle;
+}
+
+#visualization-container {
+    flex: 3;
+    display: flex;
+    flex-direction: column;
+}
+
+#song-list {
+    flex: 1;
+    margin-top: 20px;
+}
+
+#songs {
+    list-style: none;
+    padding: 0;
+}
+
+#songs li {
+    margin-bottom: 5px;
+}
