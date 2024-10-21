@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://d3js.org/d3.v7.min.js"></script>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
-    <title>Genre Treemap Visualization</title>
+    <title>Lyre - Genre Treemap Visualization</title>
     <style>
         .node {
             stroke: #fff;
@@ -16,124 +16,127 @@
             text-anchor: middle;
         }
     </style>
+
 </head>
+
 <body>
-    <h1>Genre Treemap Visualization</h1>
-    <div id="chart"></div>
-    
-    <div id="song-list">
-        <h2>Songs in Genre</h2>
-        <ul id="songs"></ul>
-    </div>
+    <div class="container">
+        <div class="header">
+            <h1>Lyre</h1>
+        </div>
+        <div class="content">
+            <div id="playlists">
+                <h2>Playlists</h2>
+                <ul>
+                    {% for playlist in playlists %}
+                        <li data-playlist-id="{{ playlist.id }}" class="{{ 'selected' if loop.first else '' }}">{{ playlist.name }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+            <div id="chart-container">
+                <div id="chart"></div>
+            </div>
+        </div>
+        
+        <!-- Remove or comment out this section if it exists -->
+        <!--
+        <div id="song-list">
+            <h2>Songs in Selected Genre</h2>
+            <ul id="songs"></ul>
+        </div>
+        -->
+        
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                const playlistItems = document.querySelectorAll('#playlists li');
+                
+                function selectPlaylist(playlistItem) {
+                    playlistItems.forEach(item => item.classList.remove('selected'));
+                    playlistItem.classList.add('selected');
+                    const playlistId = playlistItem.getAttribute('data-playlist-id');
+                    fetchGenreCounts(playlistId);
+                }
 
-    <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            // Genre data from server
-            const genreCounts = {{ genre_counts | tojson }};
-
-            // Set up the D3 treemap container
-            const width = 800;
-            const height = 600;
-
-            const data = {
-                name: "Genres",
-                children: Object.entries(genreCounts).map(([key, value]) => ({
-                    name: key,
-                    value: value
-                }))
-            };
-
-            const root = d3.hierarchy(data)
-                .sum(d => d.value)
-                .sort((a, b) => b.value - a.value);
-
-            const treemap = d3.treemap()
-                .size([width, height])
-                .padding(0);
-
-            treemap(root);
-
-            const svg = d3.select("#chart")
-                .append("svg")
-                .attr("width", width)
-                .attr("height", height);
-
-            // Define gradients
-            const defs = svg.append("defs");
-
-            const gradients = [
-                { id: "popGradient", colors: ["#ffafbd", "#ffc3a0"] },
-                { id: "rockGradient", colors: ["#ff9a9e", "#fad0c4"] },
-                { id: "jazzGradient", colors: ["#a1c4fd", "#c2e9fb"] },
-                { id: "hiphopGradient", colors: ["#fbc2eb", "#a6c1ee"] },
-                { id: "classicalGradient", colors: ["#f6d365", "#fda085"] },
-                { id: "electronicGradient", colors: ["#84fab0", "#8fd3f4"] },
-                { id: "defaultGradient", colors: ["#d4fc79", "#96e6a1"] }
-            ];
-
-            gradients.forEach(gradient => {
-                const grad = defs.append("radialGradient")
-                    .attr("id", gradient.id);
-
-                grad.append("stop")
-                    .attr("offset", "0%")
-                    .attr("stop-color", gradient.colors[0]);
-
-                grad.append("stop")
-                    .attr("offset", "100%")
-                    .attr("stop-color", gradient.colors[1]);
-            });
-
-            const nodes = svg.selectAll("g")
-                .data(root.leaves())
-                .enter()
-                .append("g")
-                .attr("transform", d => `translate(${d.x0},${d.y0})`);
-
-            nodes.append("rect")
-                .attr("class", "node")
-                .attr("id", d => d.data.name)
-                .attr("width", d => d.x1 - d.x0)
-                .attr("height", d => d.y1 - d.y0)
-                .attr("fill", d => {
-                    switch (d.data.name.toLowerCase()) {
-                        case "pop":
-                            return "url(#popGradient)";
-                        case "rock":
-                            return "url(#rockGradient)";
-                        case "jazz":
-                            return "url(#jazzGradient)";
-                        case "hip-hop":
-                            return "url(#hiphopGradient)";
-                        case "classical":
-                            return "url(#classicalGradient)";
-                        case "electronic":
-                            return "url(#electronicGradient)";
-                        default:
-                            return "url(#defaultGradient)";
-                    }
-                })
-                .on("click", function(event, d) {
-                    // Fetch and display songs by genre
-                    fetch(`/songs/${d.data.name}`)
-                        .then(response => response.json())
-                        .then(data => {
-                            const songList = document.getElementById('songs');
-                            songList.innerHTML = '';
-                            for (const [name, details] of Object.entries(data)) {
-                                const li = document.createElement('li');
-                                li.textContent = `${name} by ${details.artist}`;
-                                songList.appendChild(li);
-                            }
-                        });
+                playlistItems.forEach(item => {
+                    item.addEventListener('click', function() {
+                        selectPlaylist(this);
+                    });
                 });
 
-            nodes.append("text")
-                .attr("class", "label")
-                .attr("dx", d => (d.x1 - d.x0) / 2)
-                .attr("dy", d => (d.y1 - d.y0) / 2)
-                .text(d => d.data.name);
-        });
-    </script>
+                function fetchGenreCounts(playlistId) {
+                    fetch(`/get_genre_counts/${playlistId}`)
+                        .then(response => response.json())
+                        .then(data => {
+                            updateTreemap(data);
+                        })
+                        .catch(error => console.error('Error:', error));
+                }
+
+                function updateTreemap(genreCounts) {
+                    console.log("Updating treemap with data:", genreCounts);
+                    
+                    // Clear existing chart
+                    d3.select("#chart").selectAll("*").remove();
+
+                    // Set up the D3 treemap container
+                    const width = document.getElementById('chart').clientWidth;
+                    const height = 600;
+
+                    const data = {
+                        name: "Genres",
+                        children: Object.entries(genreCounts).map(([key, value]) => ({
+                            name: key,
+                            value: value
+                        }))
+                    };
+
+                    const root = d3.hierarchy(data)
+                        .sum(d => d.value)
+                        .sort((a, b) => b.value - a.value);
+
+                    const treemap = d3.treemap()
+                        .size([width, height])
+                        .padding(1);
+
+                    treemap(root);
+
+                    const svg = d3.select("#chart")
+                        .append("svg")
+                        .attr("width", width)
+                        .attr("height", height);
+
+                    const color = d3.scaleOrdinal(d3.schemeCategory10);
+
+                    const nodes = svg.selectAll("g")
+                        .data(root.leaves())
+                        .enter()
+                        .append("g")
+                        .attr("transform", d => `translate(${d.x0},${d.y0})`);
+
+                    nodes.append("rect")
+                        .attr("width", d => d.x1 - d.x0)
+                        .attr("height", d => d.y1 - d.y0)
+                        .attr("fill", (d, i) => color(d.data.name));
+
+                    nodes.append("text")
+                        .attr("x", 3)
+                        .attr("y", 15)
+                        .text(d => d.data.name)
+                        .attr("font-size", "12px")
+                        .attr("fill", "white");
+                }
+
+                // Create initial treemap
+                const initialGenreCounts = {{ genre_counts | tojson }};
+                console.log("Initial genre counts:", initialGenreCounts);
+                updateTreemap(initialGenreCounts);
+
+                // Select the first playlist by default
+                if (playlistItems.length > 0) {
+                    selectPlaylist(playlistItems[0]);
+                }
+            });
+        </script>
+    </div>
 </body>
 </html>

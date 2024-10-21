@@ -1,43 +1,49 @@
+from dotenv import load_dotenv, find_dotenv
+import os
 from flask import Flask, render_template, redirect, request, session, jsonify
 import spotipy
 from spotipy.oauth2 import SpotifyOAuth
-from dotenv import load_dotenv, find_dotenv
-import os
-import time
+from collections import Counter
 from collections import defaultdict
+import time
 
-# Load environment variables from .env file
-dotenv_path = find_dotenv()
-load_dotenv(dotenv_path)
-print(f"Loading environment variables from: {dotenv_path}")
+# Load environment variables
+load_dotenv(find_dotenv())
+
+# Now you can access your environment variables
+SPOTIPY_CLIENT_ID = os.getenv('SPOTIPY_CLIENT_ID')
+SPOTIPY_CLIENT_SECRET = os.getenv('SPOTIPY_CLIENT_SECRET')
+SPOTIPY_REDIRECT_URI = os.getenv('SPOTIPY_REDIRECT_URI')
 
 app = Flask(__name__)
 app.secret_key = os.urandom(24)  # Required for session management
 
-# Spotify credentials
-CLIENT_ID = os.getenv('SPOTIPY_CLIENT_ID')
-CLIENT_SECRET = os.getenv('SPOTIPY_CLIENT_SECRET')
-REDIRECT_URI = os.getenv('SPOTIPY_REDIRECT_URI')
-print(f"CLIENT_ID: {CLIENT_ID}, CLIENT_SECRET: {CLIENT_SECRET}, REDIRECT_URI: {REDIRECT_URI}")
-print(f"Redirect URI: {os.getenv('SPOTIPY_REDIRECT_URI')}")
-
 # Set up Spotipy authentication
+scope = "playlist-read-private"
 sp_oauth = SpotifyOAuth(
-    client_id=os.getenv('SPOTIPY_CLIENT_ID'),
-    client_secret=os.getenv('SPOTIPY_CLIENT_SECRET'),
-    redirect_uri=os.getenv('SPOTIPY_REDIRECT_URI'),
-    scope="playlist-read-private"
+    client_id=SPOTIPY_CLIENT_ID,
+    client_secret=SPOTIPY_CLIENT_SECRET,
+    redirect_uri=SPOTIPY_REDIRECT_URI,
+    scope=scope
 )
 
 
 @app.route('/')
 def index():
-    print("Accessing index route")
-    if not session.get('token_info'):
-        print("No token info, redirecting to login")
+    token_info = get_token()
+    if not token_info:
         return redirect('/login')
-    print("Token info found, redirecting to playlists")
-    return redirect('/playlists')
+    
+    sp = spotipy.Spotify(auth=token_info['access_token'])
+    results = sp.current_user_playlists()
+    
+    genre_counts = {}
+    if results['items']:
+        first_playlist_id = results['items'][0]['id']
+        genre_counts = get_genre_counts(sp, first_playlist_id)
+    
+    print("Initial genre counts:", genre_counts)  # Add this line for debugging
+    return render_template('index.html', playlists=results['items'], genre_counts=genre_counts)
 
 @app.route('/login')
 def login():
@@ -57,62 +63,28 @@ def callback():
 
 @app.route('/playlists')
 def playlists():
-    token_info = get_token()
-    if not token_info:
-        return redirect('/login')
-    
-    sp = spotipy.Spotify(auth=token_info['access_token'])
+    # Your existing code to fetch playlists
+    sp = spotipy.Spotify(auth=session.get('token_info').get('access_token'))
     results = sp.current_user_playlists()
     
-    return render_template('playlists.html', playlists=results['items'])
+    # For demonstration, let's use the first playlist to get genre counts
+    if results['items']:
+        first_playlist_id = results['items'][0]['id']
+        genre_counts = get_genre_counts(sp, first_playlist_id)
+    else:
+        genre_counts = {}  # Empty dict if no playlists found
+    
+    return render_template('index.html', playlists=results['items'], genre_counts=genre_counts)
 
-@app.route('/get_playlist/<playlist_id>')
-def get_playlist(playlist_id):
+@app.route('/get_genre_counts/<playlist_id>')
+def get_genre_counts_for_playlist(playlist_id):
     token_info = get_token()
     if not token_info:
         return jsonify({'error': 'Not authenticated'}), 401
     
     sp = spotipy.Spotify(auth=token_info['access_token'])
-    
-    # Get playlist tracks
-    results = sp.playlist_tracks(playlist_id)
-    tracks = results['items']
-    
-    # Get more tracks if the playlist has more than 100 tracks
-    while results['next']:
-        results = sp.next(results)
-        tracks.extend(results['items'])
-    
-    genre_counts = defaultdict(int)
-    songs = []
-    
-    for item in tracks:
-        track = item['track']
-        if track is not None:
-            # Get artist genres
-            artist_id = track['artists'][0]['id']
-            artist_info = sp.artist(artist_id)
-            genres = artist_info['genres']
-            
-            # If no genres, use "Unknown"
-            if not genres:
-                genres = ['Unknown']
-            
-            # Increment genre counts
-            for genre in genres:
-                genre_counts[genre] += 1
-            
-            # Add song information
-            songs.append({
-                'name': track['name'],
-                'artist': track['artists'][0]['name'],
-                'genre': genres[0]  # Using the first genre for simplicity
-            })
-    
-    return jsonify({
-        'genre_counts': dict(genre_counts),
-        'songs': songs
-    })
+    genre_counts = get_genre_counts(sp, playlist_id)
+    return jsonify(genre_counts)
 
 def calculate_genre_counts(songs):
     genre_counts = {}
@@ -136,6 +108,25 @@ def get_token():
         session['token_info'] = token_info
     
     return token_info
+
+def get_genre_counts(sp, playlist_id):
+    # Get tracks from the playlist
+    results = sp.playlist_tracks(playlist_id)
+    tracks = results['items']
+    
+    # Extract artist IDs
+    artist_ids = [track['track']['artists'][0]['id'] for track in tracks if track['track']]
+    
+    # Get artist details including genres
+    artists = sp.artists(artist_ids)['artists']
+    
+    # Collect all genres
+    all_genres = [genre for artist in artists for genre in artist['genres']]
+    
+    # Count genres
+    genre_counts = Counter(all_genres)
+    
+    return dict(genre_counts)
 
 if __name__ == '__main__':
     app.run(debug=True, port=5001)

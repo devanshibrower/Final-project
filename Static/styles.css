@@ -1,49 +1,78 @@
 body {
     font-family: Arial, sans-serif;
-    background-color: #faf5ee;
+    background-color: #FEFBF3;
     color: #333;
+    margin: 0;
+    padding: 0;
+}
+
+.container {
+    max-width: 1400px; /* Increased to allow for more content width */
+    margin: 0 auto;
+    padding: 1rem 5rem; /* Added top and bottom padding */
+}
+
+.header, .content {
+    padding-left: 5rem; /* Consistent left padding for alignment */
 }
 
 h1 {
     font-family: 'Georgia', serif;
-    font-size: 2.5em;
+    font-size: 2.5rem;
     font-weight: bold;
     color: #333;
+    margin-bottom: 1rem;
 }
 
-#container {
+.content {
     display: flex;
-    gap: 20px;
-    padding: 20px;
+    justify-content: space-between;
+    padding-left: 5rem;
+    /* If you want additional space above the content as well, you can add: */
+    margin-top: 2rem;
 }
 
 #playlists {
     flex: 1;
-    max-width: 250px;
+    margin-right: 5rem; /* This creates spacing between columns, equivalent to about 80px */
 }
 
 #playlists h2 {
-    font-size: 1.5em;
-    margin-bottom: 10px;
+    margin-top: 0; /* Removes default top margin from the Playlists header */
 }
 
 #playlists ul {
-    list-style: none;
-    padding: 0;
+    list-style-type: none;
+    padding-left: 0;
 }
 
 #playlists li {
-    font-size: 1.2em;
-    padding: 5px;
+    margin-bottom: 0.5rem;
     cursor: pointer;
+    color: black;  /* Ensure all list items are black by default */
+    text-decoration: none;  /* Remove any default underline */
+    font-style: normal;  /* Ensure normal font style by default */
+    font-weight: normal;  /* Ensure normal font weight by default */
 }
 
 #playlists li:hover {
     text-decoration: underline;
 }
 
+#playlists li.selected {
+    font-style: italic;
+    font-weight: bold;
+    text-decoration: underline;
+    /* No need to specify color here as it will inherit the black from the default state */
+}
+
+#chart-container {
+    flex: 2;
+}
+
 #chart {
-    flex: 3;
+    width: 100%;
+    height: 600px; /* Adjust as needed */
 }
 
 .node {
@@ -55,22 +84,18 @@ h1 {
     text-anchor: middle;
 }
 
-#visualization-container {
-    flex: 3;
-    display: flex;
-    flex-direction: column;
-}
-
+/* Remove or comment out styles like these if they exist */
+/*
 #song-list {
-    flex: 1;
-    margin-top: 20px;
+    ...
 }
 
-#songs {
-    list-style: none;
-    padding: 0;
+.node:hover {
+    ...
 }
+*/
 
-#songs li {
-    margin-bottom: 5px;
+.header {
+    padding-left: 5rem;
+    margin-bottom: 4rem; /* This would be about 64px */
 }
