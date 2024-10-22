@@ -6,23 +6,12 @@
     <script src="https://d3js.org/d3.v7.min.js"></script>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
     <title>Lyre - Genre Treemap Visualization</title>
-    <style>
-        .node {
-            stroke: #fff;
-            cursor: pointer;
-        }
-        .label {
-            font-size: 12px;
-            text-anchor: middle;
-        }
-    </style>
-
 </head>
 
 <body>
     <div class="container">
         <div class="header">
-            <h1>Lyre</h1>
+            <h1 class="page-title">Vibe</h1>
         </div>
         <div class="content">
             <div id="playlists">
@@ -55,11 +44,11 @@
                     'indie rock': ['#E74848', '#4B0082'],  // Vibrant Red to Deep Indigo
                     'punk rock': ['#E74848', '#4B0082'],  // Vibrant Red to Deep Indigo
                     'art rock': ['#FF8E53', '#8E44AD'],  // Bright Orange to Medium Purple
-                    'hip hop': ['#D6E009', '#F36C42'],  // Lime Yellow to Coral Orange
-                    'alternative hip hop': ['#D6E009', '#F36C42'],  // Lime Yellow to Coral Orange
-                    'experimental hip hop': ['#D6E009', '#F36C42'],  // Lime Yellow to Coral Orange
-                    'industrial hip hop': ['#D6E009', '#F36C42'],  // Lime Yellow to Coral Orange
-                    'rap': ['#D6E009', '#F36C42'],  // Lime Yellow to Coral Orange
+                    'hip hop': ['#D6E009', '#00BCD4'],  // Lime Yellow to Bright Cyan
+                    'alternative hip hop': ['#D6E009', '#00BCD4'],  // Lime Yellow to Bright Cyan
+                    'experimental hip hop': ['#D6E009', '#00BCD4'],  // Lime Yellow to Bright Cyan
+                    'industrial hip hop': ['#D6E009', '#00BCD4'],  // Lime Yellow to Bright Cyan
+                    'rap': ['#D6E009', '#00BCD4'],  // Lime Yellow to Bright Cyan
                     'darksynth': ['#BB97BB', '#2C003E'],  // Light Purple to Dark Purple
                     'house': ['#00B8D4', '#1A237E'],  // Bright Cyan to Deep Blue
                     'filter house': ['#00B8D4', '#1A237E'],  // Bright Cyan to Deep Blue
@@ -111,24 +100,6 @@
 
                 console.log(`No match found for ${normalizedGenre}, using default`);
                 return defaultGradient;
-            }
-
-            function getContrastColor(hexcolor) {
-                // If a leading # is provided, remove it
-                if (hexcolor.slice(0, 1) === '#') {
-                    hexcolor = hexcolor.slice(1);
-                }
-
-                // Convert to RGB value
-                var r = parseInt(hexcolor.substr(0,2),16);
-                var g = parseInt(hexcolor.substr(2,2),16);
-                var b = parseInt(hexcolor.substr(4,2),16);
-
-                // Get YIQ ratio
-                var yiq = ((r * 299) + (g * 587) + (b * 114)) / 1000;
-
-                // Check contrast
-                return (yiq >= 128) ? 'black' : 'white';
             }
 
             document.addEventListener("DOMContentLoaded", function () {
