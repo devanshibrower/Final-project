@@ -68,6 +68,9 @@ h1 {
 
 #chart-container {
     flex: 2;
+    /* If you want a border or background for the chart area, you can add it here */
+    /* border: 1px solid #ccc; */
+    /* background-color: #f9f9f9; */
 }
 
 #chart {
@@ -98,4 +101,8 @@ h1 {
 .header {
     padding-left: 5rem;
     margin-bottom: 4rem; /* This would be about 64px */
+}
+
+#chart rect {
+    fill: attr(fill);
 }

@@ -47,6 +47,90 @@
         -->
         
         <script>
+            function getGenreGradient(genre) {
+                const gradients = {
+                    'rock': ['#E74848', '#4B0082'],  // Vibrant Red to Deep Indigo
+                    'alternative rock': ['#E74848', '#4B0082'],  // Vibrant Red to Deep Indigo
+                    'modern rock': ['#E74848', '#4B0082'],  // Vibrant Red to Deep Indigo
+                    'indie rock': ['#E74848', '#4B0082'],  // Vibrant Red to Deep Indigo
+                    'punk rock': ['#E74848', '#4B0082'],  // Vibrant Red to Deep Indigo
+                    'art rock': ['#FF8E53', '#8E44AD'],  // Bright Orange to Medium Purple
+                    'hip hop': ['#D6E009', '#F36C42'],  // Lime Yellow to Coral Orange
+                    'alternative hip hop': ['#D6E009', '#F36C42'],  // Lime Yellow to Coral Orange
+                    'experimental hip hop': ['#D6E009', '#F36C42'],  // Lime Yellow to Coral Orange
+                    'industrial hip hop': ['#D6E009', '#F36C42'],  // Lime Yellow to Coral Orange
+                    'rap': ['#D6E009', '#F36C42'],  // Lime Yellow to Coral Orange
+                    'darksynth': ['#BB97BB', '#2C003E'],  // Light Purple to Dark Purple
+                    'house': ['#00B8D4', '#1A237E'],  // Bright Cyan to Deep Blue
+                    'filter house': ['#00B8D4', '#1A237E'],  // Bright Cyan to Deep Blue
+                    'deep house': ['#00B8D4', '#1A237E'],  // Bright Cyan to Deep Blue
+                    'electro house': ['#00B8D4', '#1A237E'],  // Bright Cyan to Deep Blue
+                    'progressive house': ['#00B8D4', '#1A237E'],  // Bright Cyan to Deep Blue
+                    'oxford indie': ['#3F51B5', '#9FA8DA'],  // Indigo to Light Steel Blue
+                    'pop': ['#FFD700', '#FF69B4'],  // Gold to Hot Pink
+                    'new americana': ['#F4A460', '#8B4513'],  // Sandy Brown to Saddle Brown
+                    'stomp and holler': ['#FFA726', '#D84315'],  // Orange to Rust Orange
+                    'rave': ['#8A2BE2', '#00FF7F'],  // Electric Purple to Spring Green
+                    'permanent wave': ['#00BFA5', '#32426A'],  // Bright Teal to Dark Blue-Gray
+                    'melancholia': ['#78909C', '#3E2723'],  // Blue Grey to Dark Brown
+                    'indie': ['#9370DB', '#4B0082'],  // Medium Purple to Indigo
+                    'electronic': ['#00CED1', '#0000FF'],  // Dark Turquoise to Blue
+                    'melancholia': ['#78909C', '#3E2723'],  // Blue Grey to Dark Brown
+                    'r&b': ['#DA70D6', '#8B008B'],  // Orchid to Dark Magenta
+                    'country': ['#DAA520', '#B8860B'],  // Goldenrod to Dark Goldenrod
+                    'jazz': ['#4682B4', '#000080'],  // Steel Blue to Navy
+                    'classical': ['#DEB887', '#D2691E'],  // Burlywood to Chocolate
+                    'reggae': ['#32CD32', '#006400'],  // Lime Green to Dark Green
+                    'blues': ['#4169E1', '#00008B'],  // Royal Blue to Dark Blue
+                    'metal': ['#C0C0C0', '#2F4F4F'],  // Silver to Dark Slate Gray
+                    'folk': ['#CD853F', '#8B4513'],  // Peru to Saddle Brown
+                    'latin': ['#FF4500', '#8B0000'],  // Orange-Red to Dark Red
+                    'punk': ['#FF1493', '#8B0000'],  // Deep Pink to Dark Red
+                    'soul': ['#FF69B4', '#8A2BE2'],  // Hot Pink to Blue Violet
+                    'funk': ['#FF00FF', '#9400D3'],  // Magenta to Dark Violet
+                    'dance': ['#00FFFF', '#1E90FF'],  // Cyan to Dodger Blue
+                    'alternative': ['#32CD32', '#006400'],  // Lime Green to Dark Green
+                    'disco': ['#FF69B4', '#FF00FF']  // Hot Pink to Magenta
+                };
+
+                // Default gradient for unknown genres
+                const defaultGradient = ['#A9A9A9', '#696969'];  // Dark Gray to Dim Gray
+
+                // Normalize the genre name (lowercase and trim)
+                const normalizedGenre = genre.toLowerCase().trim();
+
+                console.log(`Searching for gradient for: ${normalizedGenre}`);
+
+                // Try to find a matching gradient
+                for (const [key, value] of Object.entries(gradients)) {
+                    if (normalizedGenre.includes(key)) {
+                        console.log(`Matched ${normalizedGenre} to ${key}`);
+                        return value;
+                    }
+                }
+
+                console.log(`No match found for ${normalizedGenre}, using default`);
+                return defaultGradient;
+            }
+
+            function getContrastColor(hexcolor) {
+                // If a leading # is provided, remove it
+                if (hexcolor.slice(0, 1) === '#') {
+                    hexcolor = hexcolor.slice(1);
+                }
+
+                // Convert to RGB value
+                var r = parseInt(hexcolor.substr(0,2),16);
+                var g = parseInt(hexcolor.substr(2,2),16);
+                var b = parseInt(hexcolor.substr(4,2),16);
+
+                // Get YIQ ratio
+                var yiq = ((r * 299) + (g * 587) + (b * 114)) / 1000;
+
+                // Check contrast
+                return (yiq >= 128) ? 'black' : 'white';
+            }
+
             document.addEventListener("DOMContentLoaded", function () {
                 const playlistItems = document.querySelectorAll('#playlists li');
                 
@@ -73,8 +157,7 @@
                 }
 
                 function updateTreemap(genreCounts) {
-                    console.log("Updating treemap with data:", genreCounts);
-                    
+                    console.log("Updating treemap with genre counts:", genreCounts);
                     // Clear existing chart
                     d3.select("#chart").selectAll("*").remove();
 
@@ -107,23 +190,54 @@
 
                     const color = d3.scaleOrdinal(d3.schemeCategory10);
 
+                    // Create a single defs element
+                    const defs = svg.append("defs");
+
                     const nodes = svg.selectAll("g")
                         .data(root.leaves())
                         .enter()
                         .append("g")
                         .attr("transform", d => `translate(${d.x0},${d.y0})`);
 
-                    nodes.append("rect")
-                        .attr("width", d => d.x1 - d.x0)
-                        .attr("height", d => d.y1 - d.y0)
-                        .attr("fill", (d, i) => color(d.data.name));
+                    nodes.each(function(d) {
+                        const node = d3.select(this);
+                        const [color1, color2] = getGenreGradient(d.data.name);
+                        const gradientId = `gradient-${d.data.name.replace(/\s+/g, '-')}-${Math.random().toString(36).substr(2, 9)}`;
 
-                    nodes.append("text")
-                        .attr("x", 3)
-                        .attr("y", 15)
-                        .text(d => d.data.name)
-                        .attr("font-size", "12px")
-                        .attr("fill", "white");
+                        const gradient = defs.append("radialGradient")
+                            .attr("id", gradientId)
+                            .attr("cx", "50%")
+                            .attr("cy", "50%")
+                            .attr("r", "60%")  // or "80%", or any other percentage
+                            .attr("fx", "50%")
+                            .attr("fy", "50%");
+
+                        gradient.append("stop")
+                            .attr("offset", "0%")
+                            .attr("stop-color", color1);
+
+                        gradient.append("stop")
+                            .attr("offset", "100%")
+                            .attr("stop-color", color2);
+
+                        node.append("rect")
+                            .attr("width", d.x1 - d.x0)
+                            .attr("height", d.y1 - d.y0)
+                            .attr("fill", `url(#${gradientId})`)
+                            .attr("stroke", "#fff")
+                            .attr("stroke-width", "1px");
+
+                        // Adjust the text positioning here
+                        node.append("text")
+                            .attr("x", 8)  // Increase this value to move text right
+                            .attr("y", 15)
+                            .text(d.data.name)
+                            .attr("font-size", "12px")
+                            .attr("fill", "white")
+                            .attr("text-shadow", "1px 1px 2px rgba(0,0,0,0.5)");
+                    });
+
+                    console.log("Treemap updated with gradients");
                 }
 
                 // Create initial treemap

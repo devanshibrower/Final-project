@@ -84,6 +84,7 @@ def get_genre_counts_for_playlist(playlist_id):
     
     sp = spotipy.Spotify(auth=token_info['access_token'])
     genre_counts = get_genre_counts(sp, playlist_id)
+    print(f"Genre counts for playlist {playlist_id}: {genre_counts}")  # Add this line
     return jsonify(genre_counts)
 
 def calculate_genre_counts(songs):
@@ -126,7 +127,11 @@ def get_genre_counts(sp, playlist_id):
     # Count genres
     genre_counts = Counter(all_genres)
     
-    return dict(genre_counts)
+    # Limit to top 20 genres
+    top_genres = dict(genre_counts.most_common(20))
+    
+    print(f"Top genres for playlist {playlist_id}: {top_genres}")  # Add this line
+    return top_genres
 
 if __name__ == '__main__':
     app.run(debug=True, port=5001)
