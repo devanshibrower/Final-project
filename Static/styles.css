@@ -1,52 +1,65 @@
-body {
-    font-family: Arial, sans-serif;
-    background-color: #FEFBF3;
-    color: #333;
+:root 
+{
+    --main-bg-color: #FFF9EB;
+    --main-text-color: #333;
+    --body-font: Arial, sans-serif;
+    --header-font: Georgia, serif;
+    --standard-padding: 1rem;
+    --large-padding: 3rem;
+}
+
+body 
+{
+    font-family: var(--body-font);
+    background-color: var(--main-bg-color);
+    color: var(--main-text-color);
     margin: 0;
     padding: 0;
 }
 
-.container {
-    max-width: 1400px; /* Increased to allow for more content width */
+.container-fluid {
+    padding-left: var(--large-padding);
+    padding-right: var(--large-padding);
+    max-width: 1400px;
     margin: 0 auto;
-    padding: 1rem 5rem; /* Added top and bottom padding */
-}
-
-.header, .content {
-    padding-left: 5rem; /* Consistent left padding for alignment */
-}
-
-h1, .title {
-    font-family: Georgia, serif;
-    font-weight: bold;
-    font-size: 2.5rem; /* Increased size */
-    color: #333;
-    margin-bottom: 1rem; /* Slightly more space below */
-    line-height: 1.2; /* Adjust line height for better spacing */
 }
 
 .content {
     display: flex;
     justify-content: space-between;
     margin-top: 2rem;
-    /* If you want additional space above the content as well, you can add: */
+    padding: 0;
 }
 
-#playlists {
+h1, .title 
+{
+    font-family: var(--header-font);
+    font-weight: bold;
+    font-size: 2.5rem; /* Increased size */
+    color: var(--main-text-color);
+    margin-bottom: var(--standard-padding); /* Slightly more space below */
+    line-height: 1.2; /* Adjust line height for better spacing */
+}
+
+#playlists 
+{
     flex: 1;
-    margin-right: 5rem; /* This creates spacing between columns, equivalent to about 80px */
+    margin-right: 3rem; /* This creates spacing between columns, equivalent to about 80px */
 }
 
-#playlists h2 {
+#playlists h2 
+{
     margin-top: 0; /* Removes default top margin from the Playlists header */
 }
 
-#playlists ul {
+#playlists ul 
+{
     list-style-type: none;
     padding-left: 0;
 }
 
-#playlists li {
+#playlists li 
+{
     margin-bottom: 0.5rem;
     cursor: pointer;
     color: black;  /* Ensure all list items are black by default */
@@ -55,48 +68,41 @@ h1, .title {
     font-weight: normal;  /* Ensure normal font weight by default */
 }
 
-#playlists li:hover {
+#playlists li:hover 
+{
     text-decoration: underline;
 }
 
-#playlists li.selected {
+#playlists li.selected 
+{
     font-style: italic;
     font-weight: bold;
     text-decoration: underline;
     /* No need to specify color here as it will inherit the black from the default state */
 }
 
-#chart-container {
+#chart-container 
+{
     flex: 2;
-    /* If you want a border or background for the chart area, you can add it here */
-    /* border: 1px solid #ccc; */
-    /* background-color: #f9f9f9; */
 }
 
-#chart {
+#chart 
+{
     width: 100%;
     height: 600px; /* Adjust as needed */
 }
 
-.node {
+.node 
+{
     cursor: pointer;
 }
 
-.label {
+.label 
+{
     font-size: 12px;
     text-anchor: middle;
 }
 
-/* Remove or comment out styles like these if they exist */
-/*
-#song-list {
-    ...
-}
-
-.node:hover {
-    ...
-}
-*/
 
 .header {
     margin-bottom: 4rem; /* This would be about 64px */
