@@ -1,76 +1,113 @@
-body {
-    font-family: Arial, sans-serif;
-    background-color: #faf5ee;
-    color: #333;
+:root 
+{
+    --main-bg-color: #FFF9EB;
+    --main-text-color: #333;
+    --body-font: Arial, sans-serif;
+    --header-font: Georgia, serif;
+    --standard-padding: 1rem;
+    --large-padding: 3rem;
 }
 
-h1 {
-    font-family: 'Georgia', serif;
-    font-size: 2.5em;
-    font-weight: bold;
-    color: #333;
-}
-
-#container {
-    display: flex;
-    gap: 20px;
-    padding: 20px;
-}
-
-#playlists {
-    flex: 1;
-    max-width: 250px;
-}
-
-#playlists h2 {
-    font-size: 1.5em;
-    margin-bottom: 10px;
-}
-
-#playlists ul {
-    list-style: none;
+body 
+{
+    font-family: var(--body-font);
+    background-color: var(--main-bg-color);
+    color: var(--main-text-color);
+    margin: 0;
     padding: 0;
 }
 
-#playlists li {
-    font-size: 1.2em;
-    padding: 5px;
-    cursor: pointer;
+.container-fluid {
+    padding-left: var(--large-padding);
+    padding-right: var(--large-padding);
+    max-width: 1400px;
+    margin: 0 auto;
 }
 
-#playlists li:hover {
+.content {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 2rem;
+    padding: 0;
+}
+
+h1, .title 
+{
+    font-family: var(--header-font);
+    font-weight: bold;
+    font-size: 2.5rem; /* Increased size */
+    color: var(--main-text-color);
+    margin-bottom: var(--standard-padding); /* Slightly more space below */
+    line-height: 1.2; /* Adjust line height for better spacing */
+}
+
+#playlists 
+{
+    flex: 1;
+    margin-right: 3rem; /* This creates spacing between columns, equivalent to about 80px */
+}
+
+#playlists h2 
+{
+    margin-top: 0; /* Removes default top margin from the Playlists header */
+}
+
+#playlists ul 
+{
+    list-style-type: none;
+    padding-left: 0;
+}
+
+#playlists li 
+{
+    margin-bottom: 0.5rem;
+    cursor: pointer;
+    color: black;  /* Ensure all list items are black by default */
+    text-decoration: none;  /* Remove any default underline */
+    font-style: normal;  /* Ensure normal font style by default */
+    font-weight: normal;  /* Ensure normal font weight by default */
+}
+
+#playlists li:hover 
+{
     text-decoration: underline;
 }
 
-#chart {
-    flex: 3;
+#playlists li.selected 
+{
+    font-style: italic;
+    font-weight: bold;
+    text-decoration: underline;
+    /* No need to specify color here as it will inherit the black from the default state */
 }
 
-.node {
+#chart-container 
+{
+    flex: 2;
+}
+
+#chart 
+{
+    width: 100%;
+    height: 600px; /* Adjust as needed */
+}
+
+.node 
+{
     cursor: pointer;
 }
 
-.label {
+.label 
+{
     font-size: 12px;
     text-anchor: middle;
 }
 
-#visualization-container {
-    flex: 3;
-    display: flex;
-    flex-direction: column;
+
+.header {
+    margin-bottom: 4rem; /* This would be about 64px */
 }
 
-#song-list {
-    flex: 1;
-    margin-top: 20px;
-}
-
-#songs {
-    list-style: none;
-    padding: 0;
-}
-
-#songs li {
-    margin-bottom: 5px;
+#chart rect {
+    fill: attr(fill);
 }
