@@ -19,13 +19,16 @@ app.secret_key = os.urandom(24)  # Required for session management
 
 # Set up Spotipy authentication
 scope = "playlist-read-private"
-sp_oauth = SpotifyOAuth(
-    client_id=SPOTIPY_CLIENT_ID,
-    client_secret=SPOTIPY_CLIENT_SECRET,
-    redirect_uri=SPOTIPY_REDIRECT_URI,
-    scope=scope
-)
 
+# Add a function to create OAuth instance per user
+def create_spotify_oauth():
+    return SpotifyOAuth(
+        client_id=SPOTIPY_CLIENT_ID,
+        client_secret=SPOTIPY_CLIENT_SECRET,
+        redirect_uri=SPOTIPY_REDIRECT_URI,
+        scope=scope,
+        cache_handler=spotipy.cache_handler.FlaskSessionCacheHandler(session)
+    )
 
 @app.route('/')
 @app.route('/playlists')
@@ -47,13 +50,15 @@ def index():
 
 @app.route('/login')
 def login():
+    sp_oauth = create_spotify_oauth()
     return redirect(sp_oauth.get_authorize_url())
 
 @app.route('/callback')
 def callback():
+    sp_oauth = create_spotify_oauth()
     token_info = sp_oauth.get_access_token(request.args.get('code'))
     session['token_info'] = token_info
-    return redirect('/')  # Changed from '/playlists' to '/'
+    return redirect('/')
 
 @app.route('/get_genre_counts/<playlist_id>')
 def get_genre_counts_route(playlist_id):
@@ -80,6 +85,7 @@ def get_token():
     is_expired = token_info['expires_at'] - now < 60
     if is_expired:
         try:
+            sp_oauth = create_spotify_oauth()
             token_info = sp_oauth.refresh_access_token(token_info['refresh_token'])
             session['token_info'] = token_info
         except:
