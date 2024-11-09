@@ -19,20 +19,46 @@ Files included:
 - .env: This file stores sensitive information such as Spotify API credentials (SPOTIPY_CLIENT_ID, SPOTIPY_CLIENT_SECRET, and SPOTIPY_REDIRECT_URI). It is not included in the repository for security reasons.
 
 Design Choices:
-
 **Treemap for Genre Visualization**: A treemap was chosen to visually represent the hierarchical distribution of music genres due to its ability to show both the proportion and the relationship between different genres effectively. This allows users to quickly grasp their listening habits at a glance. Also for fun, inspired by the "Grand Perspective" app for visualizing memory usage.  
 
-**D3.js for Interactivity**: D3.js was used to create the treemap visualization because of its flexibility in rendering dynamic and interactive data visualizations.
+**D3.js for Interactivity**: D3.js was used to create the treemap visualization because of its flexibility in rendering dynamic and interactive data visualizations.Initially had challenges with visualizing large number of genres, which was solved by limiting to top 20 genres. 
 
 **Spotify API Integration**: To make the experience personal, the application integrates with Spotify's API, allowing users to visualize their own playlists rather than a generic dataset. This decision was made to create a more engaging experience by using real data from users' listening history.
 
 **Gradient Styling for Genres**: Custom gradients were applied to each genre to make the treemap aesthetically pleasing and match my figma designs. 
 
+Setup instructions:
+1. Clone the repository
+2. Create a virtual environment: `python -m venv venv`
+3. Activate the virtual environment:
+   - Windows: `venv\Scripts\activate`
+   - Unix/MacOS: `source venv/bin/activate`
+4. Install the following:
+    - Flask: web framework
+    - Spotipy: Spotify API wrapper
+    - Python-dotenv: to load environment variables from .env file
+4. Create a Spotify Developer account and register your application:
+   - Go to [Spotify Developer Dashboard](https://developer.spotify.com/dashboard)
+   - Create a new application
+   - Note: The app is in Development Mode, which means:
+     - Only users listed in the Dashboard can access the app
+     - Maximum of 25 users can be added
+     - You'll need to add the email associated with any Spotify account that wants to test the app
+6. Add test users:
+   - In your Spotify Developer Dashboard, select your app
+   - Go to 'Users and Access'
+   - Add the Spotify email addresses of any testers
+7. Create a .env file with your Spotify credentials:
+   ```
+   SPOTIPY_CLIENT_ID=your_client_id
+   SPOTIPY_CLIENT_SECRET=your_client_secret
+   SPOTIPY_REDIRECT_URI=http://localhost:5001/callback
+   ```
+8. Run the application: `python vibe.py`
 
-
+Note: Due to Spotify's Development Mode restrictions, only users whose email addresses have been added to the Dashboard will be able to log in and use the application. If you need to test the application, please contact the developer to have your Spotify email added to the allowed users list.
 
 Conclusion
-
 Vibe is a fun tool for anyone interested in exploring their music tastes in a visual format. By connecting directly with Spotify, Vibe turns a user's playlist data into a beautiful and informative visual story. 
 
 Through this project, I gained a deeper understanding of integrating APIs, using data visualization libraries like D3.js and refining front end development skills to match my figma designs.

@@ -105,9 +105,33 @@ h1, .title
 
 
 .header {
-    margin-bottom: 4rem; /* This would be about 64px */
+    display: flex;
+    justify-content: space-between; /* Distribute space between items */
+    align-items: center; 
+    margin-bottom: 4rem; 
+    margin-top: 2rem; /* Add margin to the top of the header */
+}
+
+.page-title {
+    margin: 0; /* Remove default margin */
 }
 
 #chart rect {
     fill: attr(fill);
+}
+
+#logout-btn {
+    background-color: var(--main-text-color);
+    color: var(--main-bg-color);
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+    margin-top: 1rem;
+}
+
+#logout-btn:hover {
+    opacity: 0.9;
 }
