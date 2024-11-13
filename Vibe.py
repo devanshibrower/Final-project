@@ -18,7 +18,7 @@ app = Flask(__name__)
 app.secret_key = os.urandom(24)  # Required for session management
 
 
-# create OAuth instance per user
+# create OAuth instance per user (used spotify documentation and AI for help here)
 def create_spotify_oauth():
     return SpotifyOAuth(
         client_id=SPOTIPY_CLIENT_ID,
