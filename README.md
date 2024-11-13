@@ -1,4 +1,4 @@
-# CS 50 Final Project
+# CS50 Final Project: VIBE
 
 # VIBE
 #### Video Demo:  <URL HERE>
