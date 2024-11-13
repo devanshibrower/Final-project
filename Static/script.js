@@ -1,4 +1,13 @@
 document.addEventListener("DOMContentLoaded", function () {
+    // Add this near the top of your existing code
+    const logoutBtn = document.getElementById('logout-btn');
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', function(e) {
+            console.log('Logout button clicked'); // Debug log
+            // Don't prevent default behavior, let the link work normally
+        });
+    }
+
     // Function to get gradient colors for each genre
     function getGenreGradient(genre) {
         const gradients = {
